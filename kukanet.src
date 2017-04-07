@@ -1,0 +1,86 @@
+global DEF TCP_SEND( STRINGA:IN )
+DECL CHAR STRINGA[]
+CHAR sDate[30]
+CHAR FILENAME[30]
+DECL STATE_T STAT
+INT OFFSET
+DECL MODUS_T MODE
+INT HANDLE
+   MODE=#SYNC
+   OFFSET=0
+   HANDLE = 0
+   SWRITE (sDate[], STAT, OFFSET, "%d.%d.%d %d:%d:%d.%d", $DATE.YEAR, $DATE.MONTH, $DATE.DAY, $DATE.HOUR, $DATE.MIN, $DATE.SEC, $DATE.CSEC)
+   OFFSET=0
+   SWRITE (FILENAME[], STAT, OFFSET, "%s", "\\\\.\\pipe\\kukanet")
+   IF (STAT.RET1==#CMD_ABORT) THEN
+     ;CheckError$FCT_CALL(STAT.MSG_NO,2)
+   ENDIF
+   
+   CWRITE($FCT_CALL, STAT, MODE, "krl_fopen", FILENAME[], "a", HANDLE)
+   IF (STAT.RET1==#CMD_ABORT) THEN
+      ;CheckError$FCT_CALL(STAT.MSG_NO,3)
+   ELSE
+     ;==================================================
+     ; Write a character string to the file
+     ;==================================================
+     CWRITE($FCT_CALL, STAT, MODE, "krl_fprintf", HANDLE, "%s %s 'H0D''H0A'", sDate[], STRINGA[] )
+     ;CWRITE($FCT_CALL, STAT, MODE, "krl_fputs", HANDLE, sTime[])
+     ;CWRITE($FCT_CALL, STAT, MODE, "krl_fputs", HANDLE, STRINGA[])
+     ;krl_fprintf
+     ;krl_fwriteln
+     IF (STAT.RET1==#CMD_ABORT) THEN
+       ;CheckError$FCT_CALL(STAT.MSG_NO,4)
+     ENDIF
+     ;==================================================
+     ; Close the file
+     ;==================================================
+     CWRITE($FCT_CALL, STAT, MODE, "krl_fclose", HANDLE)
+     IF (STAT.RET1==#CMD_ABORT) THEN
+       ;CheckError$FCT_CALL(STAT.MSG_NO,5)
+     ELSE
+       ;HANDLE=0
+     ENDIF
+   ENDIF
+END
+
+global DEF TCP_SEND_BOOL( STRINGA:IN, BOOLPARAM:IN )
+DECL CHAR STRINGA[]	
+DECL BOOL BOOLPARAM
+DECL STATE_T STATE
+DECL INT OFFSET
+DECL CHAR STRPARAM[50]
+DECL CHAR NEWSTR[100]
+	OFFSET = 0
+	SWRITE(STRPARAM[], STATE, OFFSET, "%d", BOOLPARAM)
+	OFFSET=StrAdd( NEWSTR[], STRINGA[] )
+	OFFSET=StrAdd( NEWSTR[], STRPARAM[] )
+	TCP_SEND( NEWSTR[] )
+END
+
+global DEF TCP_SEND_INT( STRINGA:IN, INTPARAM:IN )
+DECL CHAR STRINGA[]	
+DECL INT INTPARAM
+DECL STATE_T STATE
+DECL INT OFFSET
+DECL CHAR STRPARAM[50]
+DECL CHAR NEWSTR[100]
+	OFFSET = 0
+	SWRITE(STRPARAM[], STATE, OFFSET, "%d", INTPARAM)
+	OFFSET=StrAdd( NEWSTR[], STRINGA[] )
+	OFFSET=StrAdd( NEWSTR[], STRPARAM[] )
+	TCP_SEND( NEWSTR[] )
+END
+
+global DEF TCP_SEND_FLOAT( STRINGA:IN, FLOATPARAM:IN )
+DECL CHAR STRINGA[]	
+DECL REAL FLOATPARAM
+DECL STATE_T STATE
+DECL INT OFFSET
+DECL CHAR STRPARAM[50]
+DECL CHAR NEWSTR[100]
+	OFFSET = 0
+	SWRITE(STRPARAM[], STATE, OFFSET, "%f", FLOATPARAM)
+	OFFSET=StrAdd( NEWSTR[], STRINGA[] )
+	OFFSET=StrAdd( NEWSTR[], STRPARAM[] )
+	TCP_SEND( NEWSTR[] )
+END
