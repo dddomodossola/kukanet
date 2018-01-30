@@ -1,3 +1,5 @@
+THIS LIB DOESN'T WORK, I HADN'T ENOUGH TIME TO COMPLETE IT, unfortunately
+
 # kukanet
 TCP Ethernet messaging capability for Kuka KRC4
 
